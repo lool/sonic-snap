@@ -1,0 +1,33 @@
+name: sonic-lool
+version: 2017-01+git
+summary: Software for Open Networking in the Cloud (SONiC)
+description: |
+  SONiC is an open source project for network routers and switches.
+grade: devel
+confinement: devmode
+
+apps:
+  redis-server:
+    command: redis-launcher
+    daemon: simple
+  redis-cli:
+    command: usr/bin/redis-cli
+  # from swss: fpmsyncd, intfsyncd, neighsyncd, orchagent, portsyncd, teamsyncd; also swssconfig
+
+parts:
+  # redis-server deb from Ubuntu; this could be replaced with the upstream git
+  # repo or the redis-server deb rebuilt by SONiC
+  redis-deb:
+    plugin: nil
+    stage-packages: [redis-server]
+    stage:
+      - usr/lib/*/*.so.*
+      - usr/bin/redis-*
+      - etc/redis/redis.conf
+    # comment out config entries we want to override
+    install: sed -ri -e '/^(bind|daemonize|dir|logfile) /s/^/#/' $SNAPCRAFT_PART_INSTALL/etc/redis/redis.conf
+
+  redis-wrapper:
+    plugin: dump
+    source: redis
+

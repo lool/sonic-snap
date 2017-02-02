@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e -x
+
+# base directory for db backups
+DIR="$SNAP_DATA/redis-db"
+# default config shipped in snap
+SHIPPED_CONF="$SNAP/etc/redis/redis.conf"
+# optional config file override
+OVERRIDE_CONF="$SNAP_DATA/conf/redis.conf"
+# log file
+LOGFILE="$SNAP_DATA/logs/redis.log"
+
+conf="$SHIPPED_CONF"
+if [ -r "$OVERRIDE_CONF" ]; then
+    conf="$OVERRIDE_CONF"
+fi
+
+# create dir structure
+mkdir -p "$DIR"
+mkdir -p "$(dirname "$LOGFILE")"
+
+# note that options in config file take precedence over the flags provided
+# here; the original config is stripped of these configs during the snap build
+exec "$SNAP/usr/bin/redis-server" \
+    "$conf" \
+    --daemonize no \
+    --bind 127.0.0.1 \
+    --logfile "$LOGFILE" \
+    --dir "$DIR" \
+
