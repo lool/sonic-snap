@@ -1,10 +1,18 @@
 get_backend() {
     local backend="$(snapctl get backend)"
 
-    # TODO add lspci autodetection logic
-    if [ -z "$backend" ] || [ "$backend" = detect ]; then
+    case "$backend" in
+      ""|detect)
+        # TODO add lspci autodetection logic
         backend=broadcom
-    fi
+      ;;
+      broadcom)
+      ;;
+      *)
+        echo "Unsupported backend $backend" >&2
+        exit 1
+      ;;
+    esac
 
     echo "$backend"
 }

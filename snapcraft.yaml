@@ -79,4 +79,3 @@ parts:
       - broadcom/usr/lib/*.so.*
       - broadcom/usr/lib/*/*.so.*
       - broadcom/usr/bin/*
-
