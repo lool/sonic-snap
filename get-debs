@@ -14,4 +14,4 @@ set -x
 http "$URL/api/json?tree=artifacts[relativePath]" |
     jq -r '.artifacts[]["relativePath"]' |
     sed "s#^#$URL/artifact/#" |
-    grep -E "/${re}_.*.deb$"
+    grep -E "/${re}_.*\.deb$"
