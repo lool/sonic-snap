@@ -15,17 +15,24 @@ apps:
   # from swss: fpmsyncd, intfsyncd, neighsyncd, orchagent, portsyncd, teamsyncd; also swssconfig
 
 parts:
-  # redis-server deb from Ubuntu; this could be replaced with the upstream git
-  # repo or the redis-server deb rebuilt by SONiC
+  # redis debs built by SONiC's jenkins; this could be replaced with the
+  # upstream git repo or the redis-server deb from Ubuntu
   redis-deb:
     plugin: nil
-    stage-packages: [redis-server]
+    build-packages: [httpie, jq, wget]
+    stage-packages: [libjemalloc1]
+    install: |
+      job="common/job/redis-build"
+      debs_re="(redis-server|redis-tools)"
+      wget `./get-debs "$job" "$debs_re"`
+      for d in *.deb; do dpkg -x $d $SNAPCRAFT_PART_INSTALL; done
+      # comment out config entries we want to override
+      sed -ri -e '/^(bind|daemonize|dir|logfile) /s/^/#/' \
+          $SNAPCRAFT_PART_INSTALL/etc/redis/redis.conf
     stage:
       - usr/lib/*/*.so.*
       - usr/bin/redis-*
       - etc/redis/redis.conf
-    # comment out config entries we want to override
-    install: sed -ri -e '/^(bind|daemonize|dir|logfile) /s/^/#/' $SNAPCRAFT_PART_INSTALL/etc/redis/redis.conf
 
   redis-wrapper:
     plugin: dump

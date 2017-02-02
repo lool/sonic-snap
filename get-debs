@@ -1,0 +1,17 @@
+#!/bin/sh
+# returns a subset of the debs built by a job; e.g. this return all redis debs:
+# get-debs common/job/redis-build redis.*
+# get-debs broadcom/job/buildimage-brcm-all libhiredis
+
+job="$1"
+re="$2"
+
+JENKINS="https://sonic-jenkins.westus.cloudapp.azure.com"
+URL="$JENKINS/job/$job/lastSuccessfulBuild"
+
+set -x
+
+http "$URL/api/json?tree=artifacts[relativePath]" |
+    jq -r '.artifacts[]["relativePath"]' |
+    sed "s#^#$URL/artifact/#" |
+    grep -E "/${re}_.*.deb$"
