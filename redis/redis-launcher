@@ -10,6 +10,8 @@ SHIPPED_CONF="$SNAP/etc/redis/redis.conf"
 OVERRIDE_CONF="$SNAP_DATA/conf/redis.conf"
 # log file
 LOGFILE="$SNAP_DATA/logs/redis.log"
+# unix socket
+SOCKET="$SNAP_DATA/run/redis.sock"
 
 conf="$SHIPPED_CONF"
 if [ -r "$OVERRIDE_CONF" ]; then
@@ -17,15 +19,14 @@ if [ -r "$OVERRIDE_CONF" ]; then
 fi
 
 # create dir structure
-mkdir -p "$DIR"
-mkdir -p "$(dirname "$LOGFILE")"
+mkdir -p "$DIR" "$(dirname "$LOGFILE")" "$(dirname "$SOCKET")"
 
 # note that options in config file take precedence over the flags provided
 # here; the original config is stripped of these configs during the snap build
 exec "$SNAP/usr/bin/redis-server" \
     "$conf" \
     --daemonize no \
-    --bind 127.0.0.1 \
+    --unixsocket "$SOCKET" \
     --logfile "$LOGFILE" \
     --dir "$DIR" \
 
