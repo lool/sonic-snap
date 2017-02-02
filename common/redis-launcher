@@ -29,4 +29,5 @@ exec "$SNAP/usr/bin/redis-server" \
     --unixsocket "$SOCKET" \
     --logfile "$LOGFILE" \
     --dir "$DIR" \
+    "$@"
 

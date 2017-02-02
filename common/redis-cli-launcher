@@ -1,0 +1,5 @@
+#!/bin/sh
+
+exec "$SNAP/usr/bin/redis-cli" \
+    -s "$SNAP/link-to-redis-socket.sock" \
+    "$@"

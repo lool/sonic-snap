@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# just here to allow "snap set" to work; values are read directly from snapctl
+
+exit 0
