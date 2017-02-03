@@ -1,13 +1,23 @@
-Redis configuration
+Redis
+=====
 
 Redis is used as an in-memory database and for IPC between components.
 
-The snap includes Redis binaries and config coming from the Ubuntu .deb.
+The snap runs Redis as built by SONiC, overriding some config options.
 
-Redis listens on localhost on the default port (6379). It would be better to
-use an unix socket as to avoid conflicts between multiple redis instances.
+Redis listens on an unix socket at:
+`/var/snap/sonic-lool/current/run/redis.sock`
 
-The Redis launcher defaults to using the read-only config from the snap, but will prefer an override config from the snap's writable path, under redis/redis.conf, if present.
+The included redis-cli client defaults to this socket; e.g.:
+```% sudo `which sonic-lool.redis-cli` ping
+PONG```
 
-Database snapshots are written to redis/redis
+The default config is found at:
+`/snap/sonic-lool/current/etc/redis/redis.conf`
+
+To override it, place your config file at:
+`/var/snap/sonic-lool/current/conf/redis.conf`
+
+Database snapshots are written under:
+`/var/snap/sonic-lool/current/redis-db/`
 
