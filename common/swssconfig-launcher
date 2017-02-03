@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+. "$SNAP/lib/functions.sh"
+
+setup_env
+
+exec "$SNAP/$SONIC_BACKEND/usr/bin/swssconfig" "$@"

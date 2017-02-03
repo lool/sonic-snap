@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# starts syncd; also needs to start these other daemons:
+# https://github.com/Azure/sonic-buildimage/blob/master/dockers/docker-orchagent/start.sh
+
 set -e -x
 
 . "$SNAP/lib/functions.sh"

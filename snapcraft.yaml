@@ -12,24 +12,26 @@ apps:
     daemon: simple
   redis-cli:
     command: redis-cli-launcher
-  syncd:
-    command: syncd-launcher
+  swss:
+    command: swss-launcher
     daemon: simple
-  # missing from swss: fpmsyncd, intfsyncd, neighsyncd, orchagent, portsyncd,
-  # teamsyncd; also swssconfig
-  # p4 simple switch model
+  swssconfig:
+    command: swssconfig-launcher
   p4-switch:
     command: p4-switch-launcher
 
 hooks:
   configure:
-    plugs: []
+    # doesn't actually need network, but the store rejects plugs: [] and
+    # snapcraft wont take anything else
+    plugs: [network]
 
 parts:
   common-debs:
     plugin: nil
+    # deps of get-debs helper
     build-packages: [httpie, jq, wget]
-    # redis dep
+    # dep of redis
     stage-packages: [libjemalloc1]
     install: |
       # TODO this should be a plugin; currently doesn't fail on missing debs
@@ -68,6 +70,7 @@ parts:
 
   broadcom-backend:
     plugin: nil
+    # deps of get-debs helper
     build-packages: [httpie, jq, wget]
     install: |
       # TODO this should be a plugin; currently doesn't fail on missing debs
@@ -76,19 +79,23 @@ parts:
       debs_re="(swss|syncd|libsaibcm|libsaimetadata|libsairedis|libteam5|libopennsl)"
       wget `./get-debs "$job" "$debs_re"`
       for d in *.deb; do dpkg -x $d $SNAPCRAFT_PART_INSTALL/broadcom; done
-      # missing SONAME symlink is probably coming out of -dev deb instead of lib
+
+      # see https://github.com/Azure/SONiC/issues/52
       ln -s libsai.so.1.0 $SNAPCRAFT_PART_INSTALL/broadcom/usr/lib/libsai.so.1
-      # /var/run/redis/redis.sock is hardcoded in a bunch of binaries with
-      # no runtime override (flag or env var) so patch the binaries for now;
-      # see github.com/Azure/sonic-swss-common, common/dbconnector.h for
-      # definition and github.com/Azure/sonic-sairedis, syncd/syncd.cpp for
-      # usage
-      # NB: strings are of exact same length and this will be a relative path
-      # so working directory will matter
+
+      # see https://github.com/Azure/SONiC/issues/51
       sed -i 's#/var/run/redis/redis\.sock#link-to-redis-socket.sock#g' \
           $SNAPCRAFT_PART_INSTALL/broadcom/usr/bin/* \
           $SNAPCRAFT_PART_INSTALL/broadcom/usr/lib/*/*.so.*
+
+      # replace absolute /etc/bcm/foo pathnames with relative ones e.g.
+      # bcm-configs/foo
+      sed -i '/^SAI_INIT_CONFIG_FILE=/s#=/etc/bcm/#=bcm-configs/#' \
+          $SNAPCRAFT_PART_INSTALL/broadcom/etc/syncd.d/*
+
     stage:
+      - broadcom/etc/bcm/*
+      - broadcom/etc/syncd.d/*
       - broadcom/lib/*/*.so.*
       - broadcom/usr/lib/*.so.*
       - broadcom/usr/lib/*/*.so.*
@@ -96,8 +103,9 @@ parts:
 
   p4-backend:
     plugin: nil
+    # deps of get-debs helper
     build-packages: [httpie, jq, wget]
-    # needed by syncd
+    # deps of syncd
     stage-packages: [libjudydebian1, libnanomsg0]
     install: |
       # TODO this should be a plugin; currently doesn't fail on missing debs
@@ -120,7 +128,7 @@ parts:
 
       for d in *.deb; do dpkg -x $d $SNAPCRAFT_PART_INSTALL/p4; done
 
-      # same crude hack as broadcom
+      # see https://github.com/Azure/SONiC/issues/51
       sed -i 's#/var/run/redis/redis\.sock#link-to-redis-socket.sock#g' \
           $SNAPCRAFT_PART_INSTALL/p4/usr/bin/* \
           $SNAPCRAFT_PART_INSTALL/p4/usr/lib/*/*.so.*
