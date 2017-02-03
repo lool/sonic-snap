@@ -1,5 +1,30 @@
 #!/bin/sh
 
-# just here to allow "snap set" to work; values are read directly from snapctl
+set -e
+
+. "$SNAP/lib/functions.sh"
+
+load_config
+
+if ! SONIC_BACKEND=$(snapctl get backend 2>&1); then
+    SONIC_BACKEND=detect
+fi
+
+if [ -z "$SONIC_BACKEND" ]; then
+    SONIC_BACKEND=detect
+fi
+
+case "$SONIC_BACKEND" in
+  broadcom|detect|p4)
+  ;;
+  *)
+    echo "Unsupported backend" >&2
+    exit 1
+  ;;
+esac
+
+cat >"$SNAP_DATA/config.sh" <<EOF
+SONIC_BACKEND=$SONIC_BACKEND
+EOF
 
 exit 0

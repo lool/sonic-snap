@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e -x
+
+. "$SNAP/lib/functions.sh"
+
+setup_env
+
+exec $SNAP/p4/usr/bin/simple_switch \
+    --thrift-port 10001 \
+    $SNAP/p4/usr/share/bmpd/switch/switch.json \
+    "$@"

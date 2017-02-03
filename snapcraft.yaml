@@ -17,34 +17,47 @@ apps:
     daemon: simple
   # missing from swss: fpmsyncd, intfsyncd, neighsyncd, orchagent, portsyncd,
   # teamsyncd; also swssconfig
+  # p4 simple switch model
+  p4-switch:
+    command: p4-switch-launcher
 
 hooks:
   configure:
     plugs: []
 
 parts:
-  # redis debs built by SONiC's jenkins; this could be replaced with the
-  # upstream git repo or the redis-server deb from Ubuntu
-  redis-deb:
+  common-debs:
     plugin: nil
     build-packages: [httpie, jq, wget]
+    # redis dep
     stage-packages: [libjemalloc1]
     install: |
-      job="common/job/redis-build"
       # TODO this should be a plugin; currently doesn't fail on missing debs
       # and doesn't resolve dependencies
-      debs_re="(redis-server|redis-tools)"
-      wget `./get-debs "$job" "$debs_re"`
+
+      # download debs from SONiC's jenkins
+      wget `./get-debs "common/job/hiredis-build" "libhiredis0\\.13"`
+      wget `./get-debs "common/job/sonic-swss-common-build" "libswsscommon"`
+      wget `./get-debs \
+                "common/job/libnl3" "libnl(|-genl|-cli|-route|-nf)-3-200"`
+      wget `./get-debs "common/job/redis-build" "(redis-server|redis-tools)"`
+
+      # unpack all debs
       for d in *.deb; do dpkg -x $d $SNAPCRAFT_PART_INSTALL; done
-      # comment out config entries we want to override
+
+      # comment out redis config entries we want to override
       sed -ri -e '/^(daemonize|dir|logfile|port|unixsocket) /s/^/#/' \
           $SNAPCRAFT_PART_INSTALL/etc/redis/redis.conf
-      # allows relative path to redis-socket to work (see hack below)
+
+      # allow relative path to redis-socket to work (see hack below)
       ln -s /var/snap/sonic-lool/current/run/redis.sock \
           $SNAPCRAFT_PART_INSTALL/link-to-redis-socket.sock
     stage:
       - etc/redis/redis.conf
+      - lib/*/*.so.*
+      - usr/bin/*
       - usr/bin/redis-*
+      - usr/lib/*.so.*
       - usr/lib/*/*.so.*
       - link-to-redis-socket.sock
 
@@ -57,10 +70,10 @@ parts:
     plugin: nil
     build-packages: [httpie, jq, wget]
     install: |
-      job="broadcom/job/buildimage-brcm-all"
       # TODO this should be a plugin; currently doesn't fail on missing debs
       # and doesn't resolve dependencies
-      debs_re="(swss|syncd|libswsscommon|libsaibcm|libsaimetadata|libsairedis|libhiredis0\\.13|libnl-3-200|libnl-genl-3-200|libnl-cli-3-200|libnl-route-3-200|libnl-nf-3-200|libteam5|libopennsl)"
+      job="broadcom/job/buildimage-brcm-all"
+      debs_re="(swss|syncd|libsaibcm|libsaimetadata|libsairedis|libteam5|libopennsl)"
       wget `./get-debs "$job" "$debs_re"`
       for d in *.deb; do dpkg -x $d $SNAPCRAFT_PART_INSTALL/broadcom; done
       # missing SONAME symlink is probably coming out of -dev deb instead of lib
@@ -73,9 +86,50 @@ parts:
       # NB: strings are of exact same length and this will be a relative path
       # so working directory will matter
       sed -i 's#/var/run/redis/redis\.sock#link-to-redis-socket.sock#g' \
-          $SNAPCRAFT_PART_INSTALL/broadcom/usr/bin/*
+          $SNAPCRAFT_PART_INSTALL/broadcom/usr/bin/* \
+          $SNAPCRAFT_PART_INSTALL/broadcom/usr/lib/*/*.so.*
     stage:
       - broadcom/lib/*/*.so.*
       - broadcom/usr/lib/*.so.*
       - broadcom/usr/lib/*/*.so.*
       - broadcom/usr/bin/*
+
+  p4-backend:
+    plugin: nil
+    build-packages: [httpie, jq, wget]
+    # needed by syncd
+    stage-packages: [libjudydebian1, libnanomsg0]
+    install: |
+      # TODO this should be a plugin; currently doesn't fail on missing debs
+      # and doesn't resolve dependencies
+      wget `./get-debs "p4/job/p4c-bm" "python-p4c-bm"`
+      wget `./get-debs "p4/job/p4-bmv2" "p4-bmv2"`
+      wget `./get-debs "p4/job/p4-hlir" "python-p4-hlir"`
+      wget `./get-debs "p4/job/tenjin" "python-tenjin"`
+      wget `./get-debs "p4/job/sonic-sairedis-build" "(libsaimetadata|libsairedis|libsaivs|syncd)"`
+      wget `./get-debs "p4/job/p4-switch" "p4-switch"`
+      wget `./get-debs "p4/job/sonic-swss-build" "swss"`
+
+      # this comes from a common job, so might have to go into common-debs
+      wget `./get-debs "common/job/thrift-build" "libthrift-0.9.3"`
+
+      # Ubuntu doesn't have the same SONAMEs for libboost
+      for deb in main/b/boost1.55/libboost-program-options1.55.0_1.55.0+dfsg-3_amd64.deb main/b/boost1.55/libboost-thread1.55.0_1.55.0+dfsg-3_amd64.deb main/b/boost1.55/libboost-system1.55.0_1.55.0+dfsg-3_amd64.deb; do
+          wget "http://ftp.debian.org/debian/pool/$deb"
+      done
+
+      for d in *.deb; do dpkg -x $d $SNAPCRAFT_PART_INSTALL/p4; done
+
+      # same crude hack as broadcom
+      sed -i 's#/var/run/redis/redis\.sock#link-to-redis-socket.sock#g' \
+          $SNAPCRAFT_PART_INSTALL/p4/usr/bin/* \
+          $SNAPCRAFT_PART_INSTALL/p4/usr/lib/*/*.so.*
+    organize:
+      p4/usr/lib/*/bmpd/switch/*.so.*: p4/usr/lib
+    # TODO stage a subset of all files; drop headers, *.a etc.
+
+  # this is needed by the P4 backend
+  python2:
+    plugin: python
+    python-version: python2
+

@@ -4,9 +4,9 @@ set -e -x
 
 . "$SNAP/lib/functions.sh"
 
-# this is required to find path to link-to-redis-socket.sock
-cd "$SNAP"
-
 setup_env
 
-exec "$SNAP/$(get_backend)/usr/bin/syncd" -N "$@"
+# this is required for link-to-redis-socket.sock to be found
+cd "$SNAP"
+
+exec "$SNAP/$SONIC_BACKEND/usr/bin/syncd" -N "$@"

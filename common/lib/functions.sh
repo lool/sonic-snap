@@ -1,24 +1,33 @@
-get_backend() {
-    local backend="$(snapctl get backend)"
+# loads defaults and config if any
+load_config() {
+    local config="$SNAP_DATA/config.sh"
 
-    case "$backend" in
-      ""|detect)
-        # TODO add lspci autodetection logic
-        backend=broadcom
+    SONIC_BACKEND=detect
+
+    if [ -e "$config" ]; then
+        . "$config"
+    fi
+}
+
+detect_backend() {
+    load_config
+
+    case "$SONIC_BACKEND" in
+      broadcom|p4)
       ;;
-      broadcom)
+      detect)
+        # TODO add lspci autodetection logic
+        SONIC_BACKEND=broadcom
       ;;
       *)
-        echo "Unsupported backend $backend" >&2
+        echo "Unsupported backend" >&2
         exit 1
       ;;
     esac
-
-    echo "$backend"
 }
 
 setup_env() {
-    local backend=$(get_backend)
+    detect_backend
 
     case `uname -m` in
       x86_64)
@@ -31,11 +40,11 @@ setup_env() {
     esac
     
     
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$backend/lib"
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$backend/usr/lib"
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$backend/lib/$triplet"
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$backend/usr/lib/$triplet"
-    export PATH="$PATH:$SNAP/$backend/bin"
-    export PATH="$PATH:$SNAP/$backend/usr/bin"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$SONIC_BACKEND/lib"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$SONIC_BACKEND/usr/lib"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$SONIC_BACKEND/lib/$triplet"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$SONIC_BACKEND/usr/lib/$triplet"
+    export PATH="$PATH:$SNAP/$SONIC_BACKEND/bin"
+    export PATH="$PATH:$SNAP/$SONIC_BACKEND/usr/bin"
 }
 
