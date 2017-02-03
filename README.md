@@ -1,9 +1,20 @@
+Backend
+=======
+
+This snap includes two backends, broadcom and p4, which allow selecting which
+set of binaries to run. To choose a backend, use:
+`sudo snap set sonic-lool backend=p4`
+
+And restart services:
+`sudo systemctl restart snap.sonic-lool.syncd.service`
+
+
 Redis
 =====
 
 Redis is used as an in-memory database and for IPC between components.
 
-The snap runs Redis as built by SONiC, overriding some config options.
+This snap runs Redis as built by SONiC, overriding some config options.
 
 Redis listens on an unix socket at:
 `/var/snap/sonic-lool/current/run/redis.sock`
