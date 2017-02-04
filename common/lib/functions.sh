@@ -3,6 +3,7 @@ load_config() {
     local config="$SNAP_DATA/config.sh"
 
     SONIC_BACKEND=detect
+    SONIC_HWSKU=detect
 
     if [ -e "$config" ]; then
         . "$config"
@@ -16,7 +17,7 @@ detect_backend() {
       broadcom|p4)
       ;;
       detect)
-        # TODO add lspci autodetection logic
+        # TODO add autodetection logic
         SONIC_BACKEND=broadcom
       ;;
       *)
@@ -26,8 +27,23 @@ detect_backend() {
     esac
 }
 
+detect_hwsku() {
+    load_config
+    detect_backend
+
+    if [ "$SONIC_HWSKU" = detect ]; then
+        # TODO add autodetection logic
+        SONIC_HWSKU=wedge100
+    fi
+    if ! [ -r "$SNAP/$SONIC_BACKEND/etc/syncd.d/$SONIC_HWSKU.profile" ]; then
+        echo "Unsupported hwsku" >&2
+        exit 1
+    fi
+}
+
 setup_env() {
     detect_backend
+    detect_hwsku
 
     case `uname -m` in
       x86_64)
@@ -38,8 +54,7 @@ setup_env() {
         exit 1
       ;;
     esac
-    
-    
+
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$SONIC_BACKEND/lib"
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$SONIC_BACKEND/usr/lib"
     export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$SNAP/$SONIC_BACKEND/lib/$triplet"

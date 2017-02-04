@@ -23,8 +23,19 @@ case "$SONIC_BACKEND" in
   ;;
 esac
 
+if ! SONIC_HWSKU=$(snapctl get hwsku 2>&1); then
+    SONIC_HWSKU=detect
+fi
+
+if [ -z "$SONIC_HWSKU" ]; then
+    SONIC_HWSKU=detect
+fi
+
+# TODO validate SONIC_HWSKU against available ones
+
 cat >"$SNAP_DATA/config.sh" <<EOF
 SONIC_BACKEND=$SONIC_BACKEND
+SONIC_HWSKU=$SONIC_HWSKU
 EOF
 
 exit 0

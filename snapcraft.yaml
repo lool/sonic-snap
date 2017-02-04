@@ -14,7 +14,10 @@ apps:
     command: redis-cli-launcher
   swss:
     command: swss-launcher
+    # daemonizes on startup, so should use forking, but in forking mode it
+    # starts before redis is ready
     daemon: simple
+    #daemon: forking
   swssconfig:
     command: swssconfig-launcher
   p4-switch:
@@ -50,10 +53,6 @@ parts:
       # comment out redis config entries we want to override
       sed -ri -e '/^(daemonize|dir|logfile|port|unixsocket) /s/^/#/' \
           $SNAPCRAFT_PART_INSTALL/etc/redis/redis.conf
-
-      # allow relative path to redis-socket to work (see hack below)
-      ln -s /var/snap/sonic-lool/current/run/redis.sock \
-          $SNAPCRAFT_PART_INSTALL/link-to-redis-socket.sock
     stage:
       - etc/redis/redis.conf
       - lib/*/*.so.*
@@ -61,7 +60,6 @@ parts:
       - usr/bin/redis-*
       - usr/lib/*.so.*
       - usr/lib/*/*.so.*
-      - link-to-redis-socket.sock
 
   # common code, wrappers, configure hook etc.
   common:

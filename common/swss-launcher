@@ -2,6 +2,7 @@
 
 # starts syncd; also needs to start these other daemons:
 # https://github.com/Azure/sonic-buildimage/blob/master/dockers/docker-orchagent/start.sh
+# also should run swssconfig
 
 set -e -x
 
@@ -9,7 +10,22 @@ set -e -x
 
 setup_env
 
-# this is required for link-to-redis-socket.sock to be found
-cd "$SNAP"
+# create work dir in writable area; required by SAI at least for the broadcom backend
+SONIC_SWSS_RUN="$SNAP_DATA/run/swss"
+mkdir -p "$SONIC_SWSS_RUN"
+cd "$SONIC_SWSS_RUN"
 
-exec "$SNAP/$SONIC_BACKEND/usr/bin/syncd" -N "$@"
+# see https://github.com/Azure/SONiC/issues/51
+ln -sf "$SNAP_DATA/run/redis.sock" link-to-redis-socket.sock
+
+# FIXME this shouldn't be in a common file
+if [ "$SONIC_BACKEND" = broadcom ]; then
+    ln -sfn "$SNAP/$SONIC_BACKEND/etc/bcm" bcm-configs
+fi
+
+SONIC_SYNC_PROFILE="$SNAP/$SONIC_BACKEND/etc/syncd.d/$SONIC_HWSKU.profile"
+
+exec "$SNAP/$SONIC_BACKEND/usr/bin/syncd" \
+    -N \
+    -p "$SONIC_SYNC_PROFILE" \
+    "$@"

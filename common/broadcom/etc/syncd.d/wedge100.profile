@@ -1,1 +1,1 @@
-SAI_INIT_CONFIG_FILE=/etc/bcm/wedge.bcm
+SAI_INIT_CONFIG_FILE=bcm-configs/wedge100.bcm
