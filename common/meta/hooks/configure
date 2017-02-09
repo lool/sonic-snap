@@ -33,10 +33,14 @@ fi
 
 # TODO validate SONIC_HWSKU against available ones
 
-sed -e '/^SONIC_BACKEND=/ d' \
-    -e '/^SONIC_HWSKU=/d ' \
-    <"$SNAP_DATA/config.sh" \
-    >"$SNAP_DATA/.config.sh.tmp"
+rm -f "$SNAP_DATA/.config.sh.tmp"
+# copy over existing local configs
+if [ -e "$SNAP_DATA/config.sh" ]; then
+    sed -e '/^SONIC_BACKEND=/ d' \
+        -e '/^SONIC_HWSKU=/d ' \
+        <"$SNAP_DATA/config.sh" \
+        >"$SNAP_DATA/.config.sh.tmp"
+fi
 cat >>"$SNAP_DATA/.config.sh.tmp" <<EOF
 SONIC_BACKEND=$SONIC_BACKEND
 SONIC_HWSKU=$SONIC_HWSKU
