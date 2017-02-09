@@ -25,6 +25,10 @@ fi
 
 SONIC_SYNC_PROFILE="$SNAP/$SONIC_BACKEND/etc/syncd.d/$SONIC_HWSKU.profile"
 
+if [ -n "$SONIC_SYNC_PROFILE_OVERRIDE" ]; then
+    SONIC_SYNC_PROFILE="$SONIC_SYNC_PROFILE_OVERRIDE"
+fi
+
 exec "$SNAP/$SONIC_BACKEND/usr/bin/syncd" \
     -N \
     -p "$SONIC_SYNC_PROFILE" \
