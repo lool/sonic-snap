@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+die() {
+    echo "$@" >&2
+    exit 1
+}
+
+if [ `id -u` != 0 ]; then
+    die "Please run as root"
+fi
+
+BPN="$(dmidecode -s baseboard-product-name)"
+
+case "$BPN" in
+  "PCOM-B632VG-ECC-FB-ACCTON-D")
+    echo "wedge100"
+  ;;
+  "Wedge-AC-F 20-001329")
+    echo "wedge40"
+  ;;
+  *)
+    die "Unknown switch; please report your baseboard product name: $BPN"
+  ;;
+esac
+
