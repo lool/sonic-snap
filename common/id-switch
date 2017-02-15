@@ -37,7 +37,7 @@ esac
 
 # next look at System Information > Product Name
 case "$manufacturer-$SPN" in
-  "mellanox-MSN2100-CB2FO")
+  "mellanox-\"MSN2100-CB2FO\"")
     model=sn2100
   ;;
   "accton-To be filled by O.E.M.")
