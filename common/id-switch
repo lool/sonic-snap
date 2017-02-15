@@ -11,17 +11,52 @@ if [ `id -u` != 0 ]; then
     die "Please run as root"
 fi
 
+SM="$(dmidecode -s system-manufacturer)"
+SPN="$(dmidecode -s system-product-name)"
 BPN="$(dmidecode -s baseboard-product-name)"
 
-case "$BPN" in
-  "PCOM-B632VG-ECC-FB-ACCTON-D")
-    echo "wedge100"
+# try System Information > Manufacturer first
+case "$SM" in
+  "Mellanox Technologies Ltd.")
+    manufacturer=mellanox
   ;;
-  "Wedge-AC-F 20-001329")
-    echo "wedge40"
+  "To be filled by O.E.M.")
+    case "$BPN" in
+      "PCOM-B632VG-ECC-FB-ACCTON-D")
+        manufacturer=accton
+      ;;
+      *)
+        die "Unknown board product name; please report SM=$SM, SPN=$SPN, BPN=$BPN"
+      ;;
+    esac
   ;;
   *)
-    die "Unknown switch; please report your baseboard product name: $BPN"
+    die "Unknown manufacturer; please report SM=$SM, SPN=$SPN, BPN=$BPN"
   ;;
 esac
+
+# next look at System Information > Product Name
+case "$manufacturer-$SPN" in
+  "mellanox-MSN2100-CB2FO")
+    model=sn2100
+  ;;
+  "accton-To be filled by O.E.M.")
+    case "$BPN" in
+      "PCOM-B632VG-ECC-FB-ACCTON-D")
+        model=wedge100
+      ;;
+      *)
+        die "Unknown board product name; please report SM=$SM, SPN=$SPN, BPN=$BPN"
+      ;;
+    esac
+  ;;
+  *)
+    die "Unknown system product name; please report SM=$SM, SPN=$SPN, BPN=$BPN"
+  ;;
+esac
+
+cat <<EOF
+manufacturer=$manufacturer
+model=$model
+EOF
 
