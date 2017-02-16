@@ -17,6 +17,16 @@ BPN="$(dmidecode -s baseboard-product-name)"
 
 # try System Information > Manufacturer first
 case "$SM" in
+  "Intel")
+    case "$SPN" in
+      "EPGSVR")
+        manufacturer=accton
+      ;;
+      *)
+        die "Unknown system product name; please report SM=$SM, SPN=$SPN, BPN=$BPN"
+      ;;
+    esac
+  ;;
   "Joytech")
     case "$SPN" in
       "Wedge-AC-F 20-001329")
@@ -49,6 +59,9 @@ esac
 case "$manufacturer-$SPN" in
   "mellanox-\"MSN2100-CB2FO\"")
     model=sn2100
+  ;;
+  "accton-EPGSVR")
+    model=wedge40
   ;;
   "accton-Wedge-AC-F 20-001329")
     model=wedge40
