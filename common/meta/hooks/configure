@@ -33,17 +33,27 @@ fi
 
 # TODO validate SONIC_HWSKU against available ones
 
+if ! SONIC_MAC_ADDRESS=$(snapctl get mac-address 2>&1); then
+    SONIC_MAC_ADDRESS=detect
+fi
+
+if [ -z "$SONIC_MAC_ADDRESS" ]; then
+    SONIC_MAC_ADDRESS=detect
+fi
+
 rm -f "$SNAP_DATA/.config.sh.tmp"
 # copy over existing local configs
 if [ -e "$SNAP_DATA/config.sh" ]; then
     sed -e '/^SONIC_BACKEND=/ d' \
         -e '/^SONIC_HWSKU=/d ' \
+        -e '/^SONIC_MAC_ADDRESS=/d ' \
         <"$SNAP_DATA/config.sh" \
         >"$SNAP_DATA/.config.sh.tmp"
 fi
 cat >>"$SNAP_DATA/.config.sh.tmp" <<EOF
 SONIC_BACKEND=$SONIC_BACKEND
 SONIC_HWSKU=$SONIC_HWSKU
+SONIC_MAC_ADDRESS=$SONIC_MAC_ADDRESS
 EOF
 mv -f "$SNAP_DATA/.config.sh.tmp" "$SNAP_DATA/config.sh"
 

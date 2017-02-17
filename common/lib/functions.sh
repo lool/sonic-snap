@@ -4,6 +4,7 @@ load_config() {
 
     SONIC_BACKEND=detect
     SONIC_HWSKU=detect
+    SONIC_MAC_ADDRESS=detect
 
     if [ -e "$config" ]; then
         . "$config"
@@ -38,6 +39,26 @@ detect_hwsku() {
     if ! [ -r "$SNAP/$SONIC_BACKEND/etc/syncd.d/$SONIC_HWSKU.profile" ]; then
         echo "Unsupported hwsku" >&2
         exit 1
+    fi
+}
+
+detect_mac_address() {
+    load_config
+
+    if [ "$SONIC_MAC_ADDRESS" = detect ]; then
+	    # should at least be lo there; sort to have somewhat reliable order
+	    for dev in $(echo /sys/class/net/* | sort); do
+		if ! [ -e "$dev/device" ]; then
+		    continue
+		fi
+		# FIXME this just takes the first PCI ethernet card
+		case "$(readlink $dev/device)" in
+		  */bus/pci)
+		    SONIC_MAC_ADDRESS="$(cat "$dev/address")"
+		    break
+		  ;;
+		esac
+	    done
     fi
 }
 
