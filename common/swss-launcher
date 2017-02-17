@@ -16,6 +16,7 @@ if [ "$SONIC_HWSKU" = unconfigured ]; then
 fi
 
 detect_hwsku
+detect_mac_address
 
 # create work dir in writable area; required by SAI at least for the broadcom
 # backend
