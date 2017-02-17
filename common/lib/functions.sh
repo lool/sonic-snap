@@ -52,7 +52,7 @@ detect_mac_address() {
 		    continue
 		fi
 		# FIXME this just takes the first PCI ethernet card
-		case "$(readlink $dev/device)" in
+		case "$(readlink "$dev/device/subsystem")" in
 		  */bus/pci)
 		    SONIC_MAC_ADDRESS="$(cat "$dev/address")"
 		    break
