@@ -16,7 +16,7 @@ apps:
     command: redis-cli-launcher
   swss:
     command: swss-launcher
-    daemon: simple
+    daemon: forking
   swssconfig:
     command: swssconfig-launcher
   p4-switch:
