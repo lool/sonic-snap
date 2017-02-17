@@ -16,10 +16,7 @@ apps:
     command: redis-cli-launcher
   swss:
     command: swss-launcher
-    # daemonizes on startup, so should use forking, but in forking mode it
-    # starts before redis is ready
     daemon: simple
-    #daemon: forking
   swssconfig:
     command: swssconfig-launcher
   p4-switch:
