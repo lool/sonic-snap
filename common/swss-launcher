@@ -10,7 +10,8 @@ set -e -x
 
 setup_env
 
-# create work dir in writable area; required by SAI at least for the broadcom backend
+# create work dir in writable area; required by SAI at least for the broadcom
+# backend
 SONIC_SWSS_RUN="$SNAP_DATA/run/swss"
 mkdir -p "$SONIC_SWSS_RUN"
 cd "$SONIC_SWSS_RUN"
@@ -29,7 +30,22 @@ if [ -n "$SONIC_SYNC_PROFILE_OVERRIDE" ]; then
     SONIC_SYNC_PROFILE="$SONIC_SYNC_PROFILE_OVERRIDE"
 fi
 
-exec "$SNAP/$SONIC_BACKEND/usr/bin/syncd" \
-    -N \
-    -p "$SONIC_SYNC_PROFILE" \
-    "$@"
+syncd -N -p "$SONIC_SYNC_PROFILE" &
+
+# wait for syncd to be ready
+while [ $("$SNAP/command-redis-cli.wrapper" -n 1 HLEN HIDDEN) = 0 ]; do
+    sleep 1
+done
+
+orchagent -m "$SONIC_MAC_ADDRESS" &
+# need to find hwsku specific port_config.ini
+#portsyncd -p port_config.ini  &
+intfsyncd &
+neighsyncd &
+
+# need to list extra SWSS configs per hwsku
+#for file in $SNAP/etc/swss/config.d/*; do
+#    swssconfig "$file"
+#    sleep 1
+#done
+
