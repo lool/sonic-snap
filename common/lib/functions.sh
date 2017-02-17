@@ -38,6 +38,8 @@ detect_hwsku() {
     fi
     if [ "$SONIC_HWSKU" = detect ]; then
         # TODO add autodetection logic
+        echo "Unimplemented" >&2
+        exit 1
     fi
     if ! [ -r "$SNAP/$SONIC_BACKEND/etc/syncd.d/$SONIC_HWSKU.profile" ]; then
         echo "Unsupported hwsku" >&2
