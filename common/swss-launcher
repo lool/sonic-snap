@@ -10,6 +10,13 @@ set -e -x
 
 setup_env
 
+# bail successfully when unconfigured to allow snap install
+if [ "$SONIC_HWSKU" = unconfigured ]; then
+    exit 0
+fi
+
+detect_hwsku
+
 # create work dir in writable area; required by SAI at least for the broadcom
 # backend
 SONIC_SWSS_RUN="$SNAP_DATA/run/swss"

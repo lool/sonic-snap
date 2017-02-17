@@ -24,11 +24,11 @@ case "$SONIC_BACKEND" in
 esac
 
 if ! SONIC_HWSKU=$(snapctl get hwsku 2>&1); then
-    SONIC_HWSKU=detect
+    SONIC_HWSKU=unconfigured
 fi
 
 if [ -z "$SONIC_HWSKU" ]; then
-    SONIC_HWSKU=detect
+    SONIC_HWSKU=unconfigured
 fi
 
 # TODO validate SONIC_HWSKU against available ones

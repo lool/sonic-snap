@@ -3,7 +3,7 @@ load_config() {
     local config="$SNAP_DATA/config.sh"
 
     SONIC_BACKEND=detect
-    SONIC_HWSKU=detect
+    SONIC_HWSKU=unconfigured
     SONIC_MAC_ADDRESS=detect
 
     if [ -e "$config" ]; then
@@ -32,9 +32,12 @@ detect_hwsku() {
     load_config
     detect_backend
 
+    if [ "$SONIC_HWSKU" = unconfigured ]; then
+        echo "Unconfigured hwsku" >&2
+        exit 1
+    fi
     if [ "$SONIC_HWSKU" = detect ]; then
         # TODO add autodetection logic
-        SONIC_HWSKU=wedge100
     fi
     if ! [ -r "$SNAP/$SONIC_BACKEND/etc/syncd.d/$SONIC_HWSKU.profile" ]; then
         echo "Unsupported hwsku" >&2
@@ -64,7 +67,6 @@ detect_mac_address() {
 
 setup_env() {
     detect_backend
-    detect_hwsku
 
     case `uname -m` in
       x86_64)
