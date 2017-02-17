@@ -2,6 +2,10 @@
 load_config() {
     local config="$SNAP_DATA/config.sh"
 
+   if [ "$SONIC_CONFIG_LOADED" = 1 ]; then
+       return 0
+   fi
+
     SONIC_BACKEND=detect
     SONIC_HWSKU=unconfigured
     SONIC_MAC_ADDRESS=detect
@@ -9,6 +13,8 @@ load_config() {
     if [ -e "$config" ]; then
         . "$config"
     fi
+
+    SONIC_CONFIG_LOADED=1
 }
 
 detect_backend() {
@@ -68,6 +74,7 @@ detect_mac_address() {
 }
 
 setup_env() {
+    load_config
     detect_backend
 
     case `uname -m` in
