@@ -73,7 +73,7 @@ parts:
       # TODO this should be a plugin; currently doesn't fail on missing debs
       # and doesn't resolve dependencies
       job="broadcom/job/buildimage-brcm-all"
-      debs_re="(swss|syncd|libsaibcm|libsaimetadata|libsairedis|libteam5|libopennsl)"
+      debs_re="(swss|syncd|libsaibcm|libsaimetadata|libsairedis|libteam5|libopennsl|python-sonic-config-engine)"
       wget `./get-debs "$job" "$debs_re"`
       for d in *.deb; do dpkg -x $d $SNAPCRAFT_PART_INSTALL/broadcom; done
 
@@ -98,6 +98,7 @@ parts:
       - broadcom/usr/lib/*.so.*
       - broadcom/usr/lib/*/*.so.*
       - broadcom/usr/bin/*
+      - broadcom/usr/share/sonic
 
   p4-backend:
     plugin: nil
