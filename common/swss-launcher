@@ -46,8 +46,7 @@ while [ $("$SNAP/command-redis-cli.wrapper" -n 1 HLEN HIDDEN) = 0 ]; do
 done
 
 orchagent -m "$SONIC_MAC_ADDRESS" &
-# need to find hwsku specific port_config.ini
-#portsyncd -p port_config.ini  &
+portsyncd -p "$SNAP/$SONIC_BACKEND/usr/share/sonic/$SONIC_HWSKU/port_config.ini"  &
 intfsyncd &
 neighsyncd &
 

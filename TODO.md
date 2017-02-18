@@ -1,12 +1,10 @@
- * ship `port_config.ini` files for Wedges
+ * add correct `port_config.ini` files for Wedges
 
- * ship swssconfig files and load on startup
-
- * start portsyncd
+ * load per hwsku swssconfig files on startup
 
  * ship sonic-cfggen and parse minigraph?
 
- * start fpmsyncd? seems to depend on quagga
+ * start fpmsyncd? might depend on running modified quagga too
 
  * detection of backend and switch model
 
