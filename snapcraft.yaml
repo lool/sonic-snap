@@ -93,6 +93,7 @@ parts:
     stage:
       - broadcom/etc/bcm/*
       - broadcom/etc/syncd.d/*
+      - broadcom/etc/swss/*
       - broadcom/lib/*/*.so.*
       - broadcom/usr/lib/*.so.*
       - broadcom/usr/lib/*/*.so.*
