@@ -51,10 +51,7 @@ orchagent -m "$SONIC_MAC_ADDRESS" &
 intfsyncd &
 neighsyncd &
 
-# need to list extra SWSS configs per hwsku; for now this is just common
-# configs (typically just 00-copp control plane policing)
-for file in $SNAP/$SONIC_BACKEND/etc/swss/config.d/*; do
-    swssconfig "$file"
-    sleep 1
-done
+# common config for control plane policing
+swssconfig "$SNAP/$SONIC_BACKEND/etc/swss/config.d/00-copp.config.json"
+# TODO need to load hwsku-specific SWSS configs here
 
