@@ -51,9 +51,10 @@ orchagent -m "$SONIC_MAC_ADDRESS" &
 intfsyncd &
 neighsyncd &
 
-# need to list extra SWSS configs per hwsku
-#for file in $SNAP/etc/swss/config.d/*; do
-#    swssconfig "$file"
-#    sleep 1
-#done
+# need to list extra SWSS configs per hwsku; for now this is just common
+# configs (typically just 00-copp control plane policing)
+for file in $SNAP/$SONIC_BACKEND/etc/swss/config.d/*; do
+    swssconfig "$file"
+    sleep 1
+done
 
