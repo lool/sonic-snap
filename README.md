@@ -31,10 +31,12 @@ These are the profiles currently available and their support status:
 | Dell S6100           | `dell_s6100`        | untested       |
 | Dell S6100           | `dell_s6100`        | untested       |
 | Mellanox SN2700      | `mlnx_2700`         | untested       |
+| Wedge 100-32X        | `wedge100`          | segfaults      |
 | Wedge 100-32X        | `wedge100-128x25G`  | untested       |
 | Wedge 100-32X        | `wedge100-32x100G`  | works!         |
 | Wedge 100-32X        | `wedge100-32x40G`   | untested       |
-| Wedge 100-32X        | `wedge100`          | segfaults      |
+| Wedge 100-32X        | `wedge40`           | works!         |
+| Wedge-16X (Wedge 40) | `wedge40-16x40G`    | doesn't crash  |
 | Wedge-16X (Wedge 40) | `wedge40-16x40G`    | works!         |
 | Wedge-16X (Wedge 40) | `wedge40-64x10G`    | untested       |
 
