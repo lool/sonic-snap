@@ -1,4 +1,6 @@
- * add correct `port_config.ini` files for Wedges
+ * Wedges
+   * fix Ethernet names in `port_config.ini` files
+   * reconcile files with Accton
 
  * load per hwsku swssconfig files on startup
 
