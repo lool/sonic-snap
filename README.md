@@ -24,20 +24,20 @@ sudo systemctl restart snap.sonic-lool.swss
 
 These are the profiles currently available and their support status:
 
-| Switch               | SONiC HWSKUs        | Snap status    |
-|----------------------|---------------------|----------------|
-| Arista 7050X         | `arista_a7050_qx32` | untested       |
-| Dell S6000           | `dell_s6000`        | untested       |
-| Dell S6100           | `dell_s6100`        | untested       |
-| Dell S6100           | `dell_s6100`        | untested       |
-| Mellanox SN2700      | `mlnx_2700`         | untested       |
-| Wedge 100-32X        | `wedge100`          | segfaults      |
-| Wedge 100-32X        | `wedge100-128x25G`  | doesn't crash  |
-| Wedge 100-32X        | `wedge100-32x100G`  | works!         |
-| Wedge 100-32X        | `wedge100-32x40G`   | doesn't crash  |
-| Wedge-16X (Wedge 40) | `wedge40`           | errors out     |
-| Wedge-16X (Wedge 40) | `wedge40-16x40G`    | errors out     |
-| Wedge-16X (Wedge 40) | `wedge40-64x10G`    | untested       |
+| Switch               | SONiC HWSKUs        | Origin and Snap status    |
+|----------------------|---------------------|---------------------------|
+| Arista 7050X         | `arista_a7050_qx32` | upstream; unstested       |
+| Dell S6000           | `dell_s6000`        | upstream; unstested       |
+| Dell S6100           | `dell_s6100`        | upstream; unstested       |
+| Dell S6100           | `dell_s6100`        | upstream; unstested       |
+| Mellanox SN2700      | `mlnx_2700`         | upstream; unstested       |
+| Wedge 100-32X        | `wedge100`          | Guohan; segfaults         |
+| Wedge 100-32X        | `wedge100-128x25G`  | Wally; syncd stuck?       |
+| Wedge 100-32X        | `wedge100-32x100G`  | Wally; works!             |
+| Wedge 100-32X        | `wedge100-32x40G`   | Wally; syncd stuck?       |
+| Wedge-16X (Wedge 40) | `wedge40`           | Guohan; works!            |
+| Wedge-16X (Wedge 40) | `wedge40-16x40G`    | Wally; fails              |
+| Wedge-16X (Wedge 40) | `wedge40-64x10G`    | Wally; untested           |
 
 ## MAC address
 
