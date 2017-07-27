@@ -1,3 +1,5 @@
+[![Snap Status](https://build.snapcraft.io/badge/lool/sonic-snap.svg)](https://build.snapcraft.io/user/lool/sonic-snap)
+
 # Installation
 
 On an Ubuntu 16.04 or later system with all updates, check you have snapd
